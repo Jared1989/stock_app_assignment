@@ -42,6 +42,13 @@ def write_prices_to_file(prices=[], filename="db/prices.csv"):
             }
             writer.writerow(row)
 
+def purge_files():
+    path = os.getcwd() + "\\db\\"
+    files = os.listdir(path)
+    for name in files:
+        if "_" in name and name.endswith(".csv"):
+            os.remove(path + "/" + name)
+
 def get_symbol():
     symbol = input("Please enter one or more stock symbols separated by commas (e.g. NFLX, MSFT, GOOG, AAPL) or DONE to quit: ")
     symbol = symbol.split(", ")
@@ -85,12 +92,12 @@ def get_calc(symbol, daily_prices):
     print(f"Latest Closing Price: {latest_closing_price_usd}")
 
     recent_100_highs = [float(daily_price["high"]) for daily_price in daily_prices[0:100]]
-    average_recent_100_highs = sum(recent_100_highs)/len(recent_100_highs)
+    average_recent_100_highs = max(recent_100_highs)
     average_recent_100_highs_usd = "${0:,.2f}".format(average_recent_100_highs)
     print(f"Recent Average High: {average_recent_100_highs_usd}")
 
     recent_100_lows = [float(daily_price["low"]) for daily_price in daily_prices[0:100]]
-    average_recent_100_lows = sum(recent_100_lows)/len(recent_100_lows)
+    average_recent_100_lows = min(recent_100_lows)
     average_recent_100_lows_usd = "${0:,.2f}".format(average_recent_100_lows)
     print(f"Recent Average Low: {average_recent_100_lows_usd}")
 
@@ -145,6 +152,8 @@ if __name__ == '__main__': # only execute if file invoked from the command-line,
     symbols = []
     symbols = get_symbol()
     while symbols[0].upper() != "DONE":
+        if len(symbols) > 1:
+            purge_files()
         for s in symbols:
             get_stock(s, len(symbols))
         symbols = get_symbol()
@@ -156,3 +165,6 @@ if __name__ == '__main__': # only execute if file invoked from the command-line,
 # https://www.tutorialspoint.com/python/string_split.htm
 # https://docs.python.org/2/library/string.html
 # https://github.com/s2t2/stocks-app-py-2018
+# https://stackoverflow.com/questions/5137497/find-current-directory-and-files-directory
+# https://stackoverflow.com/questions/3964681/find-all-files-in-a-directory-with-extension-txt-in-python
+# https://stackoverflow.com/questions/6996603/how-to-delete-a-file-or-folder
